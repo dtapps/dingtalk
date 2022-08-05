@@ -20,7 +20,7 @@ type RobotSendResult struct {
 	Err    error              // 错误
 }
 
-func NewRobotSendResult(result RobotSendResponse, body []byte, http gorequest.Response, err error) *RobotSendResult {
+func newRobotSendResult(result RobotSendResponse, body []byte, http gorequest.Response, err error) *RobotSendResult {
 	return &RobotSendResult{Result: result, Body: body, Http: http, Err: err}
 }
 
@@ -32,9 +32,9 @@ func (c *Client) RobotSend(notMustParams ...gorequest.Params) *RobotSendResult {
 	// 时间
 	timestamp := time.Now().UnixNano() / 1e6
 	// 请求
-	request, err := c.request(fmt.Sprintf("https://oapi.dingtalk.com/robot/send?access_token=%s&timestamp=%d&sign=%s", c.config.AccessToken, timestamp, c.sign(timestamp)), params, http.MethodPost)
+	request, err := c.request(apiUrl+fmt.Sprintf("/robot/send?access_token=%s&timestamp=%d&sign=%s", c.config.AccessToken, timestamp, c.sign(timestamp)), params, http.MethodPost)
 	// 定义
 	var response RobotSendResponse
 	err = json.Unmarshal(request.ResponseBody, &response)
-	return NewRobotSendResult(response, request.ResponseBody, request, err)
+	return newRobotSendResult(response, request.ResponseBody, request, err)
 }
