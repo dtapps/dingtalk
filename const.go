@@ -7,3 +7,5 @@ const (
 const (
 	logTable = "dingtalk"
 )
+
+const Version = "1.0.3"
