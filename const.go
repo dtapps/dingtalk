@@ -1,7 +1,10 @@
 package dingtalk
 
 const (
-	apiUrl   = "https://oapi.dingtalk.com"
+	apiUrl = "https://oapi.dingtalk.com"
+)
+
+const (
 	logTable = "dingtalk"
-	Version  = "1.0.10"
+	Version  = "1.0.11"
 )
