@@ -5,6 +5,6 @@ const (
 )
 
 const (
-	logTable = "dingtalk"
-	Version  = "1.0.12"
+	LogTable = "dingtalk"
+	Version  = "1.0.13"
 )
