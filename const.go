@@ -6,5 +6,5 @@ const (
 
 const (
 	LogTable = "dingtalk"
-	Version  = "1.0.15"
+	Version  = "1.0.16"
 )
