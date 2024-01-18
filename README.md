@@ -1,8 +1,8 @@
 <h1>
-<a href="https://www.dtapp.net/">Golang DingTalk</a>
+<a href="https://www.dtapp.net/">Golang</a>
 </h1>
 
-📦 Golang DingTalk
+📦 Golang 钉钉机器人
 
 [comment]: <> (go)
 [![godoc](https://pkg.go.dev/badge/go.dtapp.net/dingtalk?status.svg)](https://pkg.go.dev/go.dtapp.net/dingtalk)
@@ -13,5 +13,5 @@
 #### 安装
 
 ```shell
-go get -v -u go.dtapp.net/dingtalk@v1.0.17
+go get -v -u go.dtapp.net/dingtalk@v1.0.18
 ```
