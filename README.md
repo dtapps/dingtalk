@@ -13,5 +13,5 @@
 #### 安装
 
 ```shell
-go get -v -u go.dtapp.net/dingtalk@v1.0.21
+go get -v -u go.dtapp.net/dingtalk@v1.0.22
 ```
