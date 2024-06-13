@@ -1,7 +1,7 @@
 package dingtalk
 
 const (
-	apiUrl = "https://oapi.dingtalk.com"
+	apiUrl = "https://oapi.dingtalk.com/"
 )
 
 const (

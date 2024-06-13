@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"go.dtapp.net/gojson"
 	"go.dtapp.net/gorequest"
+	"go.opentelemetry.io/otel/codes"
 	"net/http"
 	"time"
 )
@@ -46,18 +47,31 @@ func (c *Client) RobotSend(ctx context.Context, access_token string, notMustPara
 // RobotSendSign 发送消息签名版
 // https://open.dingtalk.com/document/group/custom-robot-access
 func (c *Client) RobotSendSign(ctx context.Context, access_token string, secret string, notMustParams ...gorequest.Params) (*RobotSendResult, error) {
+
+	// OpenTelemetry链路追踪
+	ctx = c.TraceStartSpan(ctx, "robot/send")
+	defer c.TraceEndSpan()
+
 	// 参数
 	params := gorequest.NewParamsWith(notMustParams...)
 	// 时间
 	timestamp := time.Now().UnixNano() / 1e6
+
 	// 请求
-	request, err := c.request(ctx, apiUrl+fmt.Sprintf("/robot/send?access_token=%s&timestamp=%d&sign=%s", access_token, timestamp, c.robotSendSignGetSign(secret, timestamp)), params, http.MethodPost)
+	request, err := c.request(ctx, fmt.Sprintf("robot/send?access_token=%s&timestamp=%d&sign=%s", access_token, timestamp, c.robotSendSignGetSign(secret, timestamp)), params, http.MethodPost)
 	if err != nil {
+		c.TraceRecordError(err)
+		c.TraceSetStatus(codes.Error, err.Error())
 		return newRobotSendResult(RobotSendResponse{}, request.ResponseBody, request), err
 	}
+
 	// 定义
 	var response RobotSendResponse
 	err = gojson.Unmarshal(request.ResponseBody, &response)
+	if err != nil {
+		c.TraceRecordError(err)
+		c.TraceSetStatus(codes.Error, err.Error())
+	}
 	return newRobotSendResult(response, request.ResponseBody, request), err
 }
 
