@@ -6,9 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"go.dtapp.net/gojson"
 	"go.dtapp.net/gorequest"
-	"go.opentelemetry.io/otel/codes"
 	"net/http"
 	"time"
 )
@@ -31,16 +29,17 @@ func newRobotSendResult(result RobotSendResponse, body []byte, http gorequest.Re
 // RobotSend 发送消息
 // https://open.dingtalk.com/document/group/custom-robot-access
 func (c *Client) RobotSend(ctx context.Context, access_token string, notMustParams ...gorequest.Params) (*RobotSendResult, error) {
+
+	// OpenTelemetry链路追踪
+	ctx = c.TraceStartSpan(ctx, "robot/send")
+	defer c.TraceEndSpan()
+
 	// 参数
 	params := gorequest.NewParamsWith(notMustParams...)
+
 	// 请求
-	request, err := c.request(ctx, apiUrl+fmt.Sprintf("/robot/send?access_token=%s", access_token), params, http.MethodPost)
-	if err != nil {
-		return newRobotSendResult(RobotSendResponse{}, request.ResponseBody, request), err
-	}
-	// 定义
 	var response RobotSendResponse
-	err = gojson.Unmarshal(request.ResponseBody, &response)
+	request, err := c.request(ctx, apiUrl+fmt.Sprintf("/robot/send?access_token=%s", access_token), params, http.MethodPost, &response)
 	return newRobotSendResult(response, request.ResponseBody, request), err
 }
 
@@ -58,20 +57,8 @@ func (c *Client) RobotSendSign(ctx context.Context, access_token string, secret 
 	timestamp := time.Now().UnixNano() / 1e6
 
 	// 请求
-	request, err := c.request(ctx, fmt.Sprintf("robot/send?access_token=%s&timestamp=%d&sign=%s", access_token, timestamp, c.robotSendSignGetSign(secret, timestamp)), params, http.MethodPost)
-	if err != nil {
-		c.TraceRecordError(err)
-		c.TraceSetStatus(codes.Error, err.Error())
-		return newRobotSendResult(RobotSendResponse{}, request.ResponseBody, request), err
-	}
-
-	// 定义
 	var response RobotSendResponse
-	err = gojson.Unmarshal(request.ResponseBody, &response)
-	if err != nil {
-		c.TraceRecordError(err)
-		c.TraceSetStatus(codes.Error, err.Error())
-	}
+	request, err := c.request(ctx, fmt.Sprintf("robot/send?access_token=%s&timestamp=%d&sign=%s", access_token, timestamp, c.robotSendSignGetSign(secret, timestamp)), params, http.MethodPost, &response)
 	return newRobotSendResult(response, request.ResponseBody, request), err
 }
 
